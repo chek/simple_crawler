@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  url: http://some_existing_url.com
+  crawled_data:
+  state: 0
+
+two:
+  url: http://www.html5rocks.com/en/tutorials/developertools/async-call-stack/
+  crawled_data:
+  state: 0
