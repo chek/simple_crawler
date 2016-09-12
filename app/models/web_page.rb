@@ -1,59 +1,98 @@
+class WebPageState
+  FAILED_TO_PARSE = -1
+  REGISTERD = 0
+  PARSED = 1
+  ALREADY_PARSED = 2
+end
+
 class WebPage < ApplicationRecord
 
   def as_json
-    super(:only => [:id, :url], :methods => [:crawled_data_json])
+    super(:only => [:id, :url], :methods => [:parsed_data])
   end
 
-  def crawled_data_json
-    return JSON.parse self.crawled_data if !self.crawled_data.blank?
+  def parsed_data
+    return WebPageParsedTag.where('web_page_id = ?', self.id)
   end
 
   def parse
-    result, state = WebPage.parse_url(self.url)
-    self.crawled_data = result.to_json
-    self.state = state
-    self.save
+    result, state, response_body = parse_url(self.url)
+    save_parse_results(result, state, response_body) if state != WebPageState::ALREADY_PARSED
     return result, state
   end
 
-  def self.parse_url(url, cycle = 0)
+  def parse_url(url, cycle = 0)
     result = {}
-    result['h1'] = []
-    result['h2'] = []
-    result['h3'] = []
-    result['a'] = []
-    state = -1
-    return result, state if cycle > 10
+    state = WebPageState::FAILED_TO_PARSE
+    response_body = ''
+    return result, state, response_body if cycle > 10
+    response = read_content(url)
+    if response.is_a? Net::HTTPSuccess
+      if response.body.eql?(self.content) and !parsed_data.blank?
+        state = WebPageState::ALREADY_PARSED
+        return result, state, response_body
+      end
+      result = parse_response(response)
+      state = WebPageState::PARSED
+    elsif response.is_a? Net::HTTPRedirection
+      return parse_url(URI.parse(res['location']), cycle + 1)
+    end
+    return result, state, response_body
+  end
+
+  def read_content(url)
     url = URI.parse(url)
     req = Net::HTTP::Get.new(url.to_s)
     res = Net::HTTP.start(url.host, url.port) {|http|
       http.request(req)
     }
-    response_body = res.body
-    if res.is_a? Net::HTTPSuccess
-      response_body.scan(/<h1(.*)<\/h1/) do |match|
-        match[0].scan(/^>(.*)/) do |match1|
-          result['h1'] << match1[0]
-        end
-      end
-      response_body.scan(/<h2(.*)<\/h2/) do |match|
-        match[0].scan(/^>(.*)/) do |match1|
-          result['h2'] << match1[0]
-        end
-      end
-      response_body.scan(/<h3(.*)<\/h3/) do |match|
-        match[0].scan(/^>(.*)/) do |match1|
-          result['h3'] << match1[0]
-        end
-      end
-      response_body.scan(/<a\s+href=\s*"([^"]+)/) do |match|
-        result['a'] << match[0]
-      end
-      state = 1
-    elsif response.is_a? Net::HTTPRedirection
-      return self.parse_url(URI.parse(res['location']), cycle + 1)
+    return res
+  end
+
+  def parse_response(response)
+    result = {}
+    result['h1'] = []
+    result['h2'] = []
+    result['h3'] = []
+    result['a'] = []
+    response_body = response.body
+    ['h1','h2','h3'].each{ |h_tag|
+      result[h_tag] = parse_tag(response_body, Regexp.new("<#{h_tag}(.*)<\/#{h_tag}"))
+    }
+    result['a'] = parse_tag(response_body, Regexp.new('<a\s+href=\s*"([^"]+)'))
+    return result
+  end
+
+  def parse_tag(response_body, regex)
+    result = []
+    response_body.scan(regex) do |match|
+      result << match[0]
     end
-    return result, state
+    return result
+  end
+
+  def save_parse_results(result, state, response_body)
+    if state == 1
+      tags = []
+      result.each{ |tag_name, items|
+        items.each{ |item|
+          tag = WebPageParsedTag.new
+          tag.web_page_id = self.id
+          tag.tag = tag_name
+          tag.content = item
+          tags << tag
+        }
+      }
+      WebPageParsedTag.transaction do
+        WebPageParsedTag.where('web_page_id = ?', self.id).delete_all
+        tags.each{ |tag|
+          tag.save
+        }
+      end
+      self.content = response_body
+    end
+    self.state = state
+    self.save
   end
 
 end

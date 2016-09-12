@@ -10,7 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160910105309) do
+ActiveRecord::Schema.define(version: 20160912060259) do
+
+  create_table "web_page_parsed_tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "web_page_id"
+    t.string   "tag",         limit: 32,    null: false, collation: "utf8_unicode_ci"
+    t.text     "content",     limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "web_pages", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "url",                                    null: false, collation: "utf8_unicode_ci"
