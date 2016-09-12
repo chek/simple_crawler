@@ -1,24 +1,28 @@
-# README
+# Simple web crawler service
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## To run this project you need.
 
-Things you may want to cover:
+  * Install or have installed Ruby version 2.2.2
 
-* Ruby version
+  * Install or have installed Rails 5
 
-* System dependencies
+  * Install or have installed MySQL server
 
-* Configuration
+  * Change database name and credentials in config/database.yml
 
-* Database creation
+  * Create db tables using: rake db:schema:load
 
-* Database initialization
+  * To run tests -> rails test
+  
+  * To run project -> rails s
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+## This sevice have 3 endpoints
+  
+  * POST /web_pages/register (url parameter required), to register and schedule parsing for a new web page
+  
+  * GET /web_pages/list, to get all registered web pages
+  
+  * GET /web_pages/parse (url or id parameter required), to schedule parsing for existing web pages
+  
+To test project use test.html and test.js in public folder. 
+Change test.js for using any endpoint and request type. Open http://localhost:3000/test.html in browser, see console output.
