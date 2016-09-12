@@ -12,18 +12,19 @@
 
 ActiveRecord::Schema.define(version: 20160912060259) do
 
-  create_table "web_page_parsed_tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "web_page_parsed_tags", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "web_page_id"
     t.string   "tag",         limit: 32,    null: false, collation: "utf8_unicode_ci"
     t.text     "content",     limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["web_page_id"], name: "page_id_index", using: :btree
   end
 
   create_table "web_pages", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string   "url",                                    null: false, collation: "utf8_unicode_ci"
-    t.text     "crawled_data", limit: 65535
-    t.integer  "state",                      default: 0
+    t.string   "url",                                     null: false, collation: "utf8_unicode_ci"
+    t.binary   "content",    limit: 16777215
+    t.integer  "state",                       default: 0
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["url"], name: "url_index", unique: true, using: :btree
