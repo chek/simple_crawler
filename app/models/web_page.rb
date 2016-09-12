@@ -75,7 +75,7 @@ class WebPage < ApplicationRecord
   end
 
   def save_parsed_results(result, state, response_body)
-    if state == 1
+    if state == WebPageState::PARSED
       tags = []
       result.each{ |tag_name, items|
         items.each{ |item|
@@ -88,9 +88,7 @@ class WebPage < ApplicationRecord
       }
       WebPageParsedTag.transaction do
         WebPageParsedTag.where('web_page_id = ?', self.id).delete_all
-        tags.each{ |tag|
-          tag.save
-        }
+        WebPageParsedTag.import tags
       end
       self.content = response_body
     end
