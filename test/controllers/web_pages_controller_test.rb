@@ -21,4 +21,10 @@ class WebPagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should schedule parse" do
+    page = web_pages(:one)
+    post '/web_pages/parse/' + page.id.to_s
+    assert_response :success
+  end
+
 end
