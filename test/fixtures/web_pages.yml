@@ -1,11 +1,13 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  id: 1
   url: http://some_existing_url.com
-  content: sdfsdfsdfsdfsdfsdfsdfsd
+  content:
   state: 0
 
 two:
-  url: http://www.html5rocks.com/en/tutorials/developertools/async-call-stack/
+  id: 2
+  url: http://www.example.com/
   content: sdfsdfsdfsdfsdfsdfsdfsd
-  state: 0
+  state: 1

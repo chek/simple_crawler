@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  web_page_id: 2
+  tag: a
+  content: http://some.com
+
+two:
+  web_page_id: 2
+  tag: h1
+  content: dgdgdfgdfd

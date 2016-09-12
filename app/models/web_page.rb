@@ -17,7 +17,7 @@ class WebPage < ApplicationRecord
 
   def parse
     result, state, response_body = parse_url(self.url)
-    save_parse_results(result, state, response_body) if state != WebPageState::ALREADY_PARSED
+    save_parsed_results(result, state, response_body) if state != WebPageState::ALREADY_PARSED
     return result, state
   end
 
@@ -51,27 +51,30 @@ class WebPage < ApplicationRecord
 
   def parse_response(response)
     result = {}
-    result['h1'] = []
-    result['h2'] = []
-    result['h3'] = []
-    result['a'] = []
     response_body = response.body
     ['h1','h2','h3'].each{ |h_tag|
-      result[h_tag] = parse_tag(response_body, Regexp.new("<#{h_tag}(.*)<\/#{h_tag}"))
+      result[h_tag] = parse_tag(response_body, Regexp.new("<#{h_tag}([^<]*)<\/#{h_tag}"))
     }
-    result['a'] = parse_tag(response_body, Regexp.new('<a\s+href=\s*"([^"]+)'))
+    result['a'] = parse_tag(response_body, Regexp.new('<a\s+href=\s*"([^">]+)'), false)
+    result['a'] += parse_tag(response_body, Regexp.new("<a\s+href=\s*'([^'>]+)"), false)
     return result
   end
 
-  def parse_tag(response_body, regex)
+  def parse_tag(response_body, regex, second_regex = true)
     result = []
     response_body.scan(regex) do |match|
-      result << match[0]
+      if second_regex
+        match[0].scan(/^>(.*)/) do |match1|
+          result << match1[0]
+        end
+      else
+        result << match[0]
+      end
     end
     return result
   end
 
-  def save_parse_results(result, state, response_body)
+  def save_parsed_results(result, state, response_body)
     if state == 1
       tags = []
       result.each{ |tag_name, items|

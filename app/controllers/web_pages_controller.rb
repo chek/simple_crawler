@@ -1,34 +1,25 @@
 class WebPagesController < ApplicationController
 
   def register
-    if !params[:url].blank?
-      web_page = WebPage.where('url = ?', params[:url]).first
-      if web_page.blank?
-        web_page = WebPage.new
-        web_page.url = params[:url]
-        web_page.save
-        ParsePageJob.perform_later(web_page)
-        return render :status => 201
-      else
-        return render :status => 302
-      end
-    end
-    render :status => 400
+    return render :status => 400 if params[:url].blank?
+    web_page = WebPage.where('url = ?', params[:url]).first
+    return render :status => 302 if !web_page.blank?
+    web_page = WebPage.new
+    web_page.url = params[:url]
+    web_page.save
+    ParsePageJob.perform_later(web_page) if !Rails.env.test?
+    return render :status => 201
   end
 
   def list
-    web_pages = WebPage.all
-    render :json => {:pages => web_pages.as_json}
+    render :json => {:pages => WebPage.all.as_json}
   end
 
   def parse
-    web_page = WebPage.find(params[:id]) if !params[:id].blank?
-    web_page = WebPage.where('url = ?', params[:url]).first if !params[:url].blank? and params[:id].blank?
-    if !web_page.blank?
-      ParsePageJob.perform_later(web_page)
-      return render :status => 202
-    end
-    return render :status => 404
+    web_page = WebPage.where('id = ?', params[:id]).first if !params[:id].blank?
+    return render :status => 404 if web_page.blank?
+    ParsePageJob.perform_later(web_page) if !Rails.env.test?
+    return render :status => 202
   end
 
 end
