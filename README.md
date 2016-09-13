@@ -2,15 +2,20 @@
 
 ## To run this project you need.
 
-  * Install or have installed Ruby version 2.2.2
+  * Ruby 2.2.2
 
-  * Install or have installed Rails 5
+  * Rails 5
 
-  * Install or have installed MySQL server
-
+  * MySQL server
+  
   * Change database name and credentials in config/database.yml
 
-  * Create db tables using: rake db:schema:load
+  * Create database tables using: rake db:schema:load
+  *
+  * Run from project dir
+```ruby
+bundle install
+```
 
   * To run tests -> rails test
   
@@ -22,7 +27,7 @@
   
   * GET /web_pages/list, to get all registered web pages
   
-  * GET /web_pages/parse (url or id parameter required), to schedule parsing for existing web pages
+  * POST /web_pages/parse/:id (id parameter required), to schedule parsing for existing web pages
   
 To test project use test.html and test.js in public folder. 
 Change test.js for using any endpoint and request type. Open http://localhost:3000/test.html in browser, see console output.
