@@ -17,15 +17,21 @@
 bundle install
 ```
 
-  * To run tests -> rails test
+  * To run tests
+```ruby
+rails test
+```
   
-  * To run project -> rails s
+  * To run project
+```ruby
+rails s
+```
 
 ## This sevice have 3 endpoints
   
   * POST /web_pages/register (url parameter required), to register and schedule parsing for a new web page
   
-  * GET /web_pages/list, to get all registered web pages
+  * GET /web_pages/list, to get all registered web pages with parsed data
   
   * POST /web_pages/parse/:id (id parameter required), to schedule parsing for existing web pages
   
