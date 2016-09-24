@@ -1,4 +1,3 @@
 .idea
-Gemfile.lock
 tmp/*
 log/*
