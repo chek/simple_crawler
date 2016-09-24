@@ -9,6 +9,9 @@ gem 'mysql2'
 gem 'figaro'
 # Use Puma as the app server
 gem 'puma', '~> 3.0'
+gem "unicorn"
+gem "thin"
+gem "passenger"
 group :development do
   gem 'capistrano'
   gem 'capistrano3-puma'
