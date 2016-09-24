@@ -6,9 +6,9 @@ gem 'rails', '~> 5.0.0'
 # Use sqlite3 as the database for Active Record
 gem 'mysql2'
 
-gem 'figaro'
 # Use Puma as the app server
 gem 'puma', '~> 3.0'
+gem 'figaro'
 gem "unicorn"
 gem "thin"
 gem "passenger"
