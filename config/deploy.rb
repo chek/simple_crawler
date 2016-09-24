@@ -60,3 +60,7 @@ set :puma_workers, 0
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
+run "cp /var/www/test_app/code/Passengerfile /var/www/test_app/code/current/Passengerfile.json"
+run "cd /var/www/test_app/code/current"
+run "rvmsudo bundle exec passenger stop"
+run "rvmsudo bundle exec passenger start"
